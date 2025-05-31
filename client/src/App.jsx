@@ -189,7 +189,7 @@ function App() {
           <div className="form-group">
             <textarea
               name="content"
-              placeholder="What's on your mind? (max 280 characters)"
+              placeholder="What's on your mind?"
               value={formData.content}
               onChange={handleInputChange}
               maxLength="280"
