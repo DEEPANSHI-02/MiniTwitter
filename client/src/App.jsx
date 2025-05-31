@@ -14,6 +14,15 @@ function App() {
     author: ''
   });
   const [submitting, setSubmitting] = useState(false);
+  const [likedNotes, setLikedNotes] = useState(() => {
+    // Get liked notes from localStorage on first render
+    const stored = localStorage.getItem('likedNotes');
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('likedNotes', JSON.stringify(likedNotes));
+  }, [likedNotes]);
 
   const fetchNotes = async (page = 1) => {
     setLoading(true);
@@ -75,6 +84,7 @@ function App() {
   };
 
   const likeNote = async (noteId) => {
+    if (likedNotes.includes(noteId)) return; // Prevent multiple likes
     try {
       const response = await fetch(`${API_BASE}/notes/${noteId}/like`, {
         method: 'PATCH'
@@ -89,6 +99,7 @@ function App() {
               : note
           )
         );
+        setLikedNotes(prev => [...prev, noteId]);
       }
     } catch (err) {
       setError(`Error liking note: ${err.message}`);
@@ -96,6 +107,7 @@ function App() {
   };
 
   const unlikeNote = async (noteId) => {
+    if (!likedNotes.includes(noteId)) return; // Only allow unlike if previously liked
     try {
       const response = await fetch(`${API_BASE}/notes/${noteId}/unlike`, {
         method: 'PATCH'
@@ -110,6 +122,7 @@ function App() {
               : note
           )
         );
+        setLikedNotes(prev => prev.filter(id => id !== noteId));
       }
     } catch (err) {
       setError(`Error unliking note: ${err.message}`);
@@ -129,6 +142,7 @@ function App() {
       
       if (data.success) {
         setNotes(prevNotes => prevNotes.filter(note => note._id !== noteId));
+        setLikedNotes(prev => prev.filter(id => id !== noteId)); // Remove from likedNotes if deleted
       }
     } catch (err) {
       setError(`Error deleting note: ${err.message}`);
@@ -221,6 +235,7 @@ function App() {
                     <button 
                       className="action-button like-button"
                       onClick={() => likeNote(note._id)}
+                      disabled={likedNotes.includes(note._id)}
                     >
                       👍
                     </button>
@@ -228,7 +243,7 @@ function App() {
                     <button 
                       className="action-button unlike-button"
                       onClick={() => unlikeNote(note._id)}
-                      disabled={note.likes === 0}
+                      disabled={!likedNotes.includes(note._id) || note.likes === 0}
                     >
                       👎
                     </button>
