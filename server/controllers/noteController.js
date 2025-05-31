@@ -18,7 +18,7 @@ const createNote = async (req, res) => {
       author: author.trim() 
     });
     
-    const savedNote = await newNote.save();
+      const savedNote = await newNote.save();
     
     res.status(201).json({
       success: true,
