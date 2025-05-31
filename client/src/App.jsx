@@ -158,7 +158,6 @@ function App() {
         <h1>🐤 Mini Twitter</h1>
         <p>Share your thoughts with the world!</p>
       </header>
-
       <div className="create-section">
         <h2>✍️ Create New Note</h2>
         <form onSubmit={createNote}>
@@ -191,15 +190,13 @@ function App() {
             {submitting ? '📝 Posting...' : '🚀 Post Note'}
           </button>
         </form>
+        {error && (
+          <div className="error-message">
+            ⚠️ {error}
+            <button onClick={() => setError('')}>×</button>
+          </div>
+        )}
       </div>
-
-      {error && (
-        <div className="error-message">
-          ⚠️ {error}
-          <button onClick={() => setError('')}>×</button>
-        </div>
-      )}
-
       <div className="notes-section">
         <h2>📋 All Notes</h2>
         {loading ? (
@@ -210,47 +207,41 @@ function App() {
           </div>
         ) : (
           <>
-            <div className="notes-grid">
-              {notes.map(note => (
-                <div key={note._id} className="note-card">
-                  <div className="note-header">
-                    <span className="author">👤 {note.author}</span>
-                    <span className="date">🕒 {formatDate(note.createdAt)}</span>
-                  </div>
-                  
-                  <div className="note-content">
-                    {note.content}
-                  </div>
-                  
-                  <div className="note-actions">
-                    <div className="like-section">
-                      <button 
-                        className="action-button like-button"
-                        onClick={() => likeNote(note._id)}
-                      >
-                        👍
-                      </button>
-                      <span className="like-count">{note.likes ?? 0}</span>
-                      <button 
-                        className="action-button unlike-button"
-                        onClick={() => unlikeNote(note._id)}
-                        disabled={note.likes === 0}
-                      >
-                        👎
-                      </button>
-                    </div>
-                    
+            {notes.map(note => (
+              <div key={note._id} className="note-card">
+                <div className="note-header">
+                  <span className="author">👤 {note.author}</span>
+                  <span className="date">🕒 {formatDate(note.createdAt)}</span>
+                </div>
+                <div className="note-content">
+                  {note.content}
+                </div>
+                <div className="note-actions">
+                  <div className="like-section">
                     <button 
-                      className="action-button delete-button"
-                      onClick={() => deleteNote(note._id)}
+                      className="action-button like-button"
+                      onClick={() => likeNote(note._id)}
                     >
-                      🗑️
+                      👍
+                    </button>
+                    <span className="like-count">{note.likes ?? 0}</span>
+                    <button 
+                      className="action-button unlike-button"
+                      onClick={() => unlikeNote(note._id)}
+                      disabled={note.likes === 0}
+                    >
+                      👎
                     </button>
                   </div>
+                  <button 
+                    className="action-button delete-button"
+                    onClick={() => deleteNote(note._id)}
+                  >
+                    🗑️
+                  </button>
                 </div>
-              ))}
-            </div>
-
+              </div>
+            ))}
             {pagination?.totalPages > 1 && (
               <div className="pagination">
                 <button 
@@ -260,11 +251,9 @@ function App() {
                 >
                   ⬅️ Previous
                 </button>
-                
                 <span className="page-info">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
-                
                 <button 
                   className="page-button"
                   onClick={() => fetchNotes(currentPage + 1)}
